@@ -77,9 +77,9 @@ def do_part_2(filename: str) -> int:
 
 def main():
     assert do_part_1("input_3_test") == 4361
-    print(do_part_1("input_3"))
+    print(do_part_1("input_3_full"))
     assert do_part_2("input_3_test") == 467835
-    print(do_part_2("input_3"))
+    print(do_part_2("input_3_full"))
     
 
 

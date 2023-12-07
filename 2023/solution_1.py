@@ -22,7 +22,7 @@ def parse_line(line: str) -> int:
 
 def main():
     sum = 0
-    with open("input_1", "r") as file:
+    with open("input_1_full", "r") as file:
         for line in file:
             sum += parse_line(line)
     print(sum)

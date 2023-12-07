@@ -59,7 +59,7 @@ def parse_line(line: str) -> int:
 def main():
     with open('input_2_test', "r") as file:
         assert sum(parse_line(line) for line in file.read().splitlines()) == 2286
-    with open('input_2', "r") as file:
+    with open('input_2_full', "r") as file:
         print(sum(parse_line(line) for line in file.read().splitlines()))
 
 if __name__ == "__main__":
