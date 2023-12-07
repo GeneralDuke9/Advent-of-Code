@@ -1,8 +1,8 @@
-from dataclasses import dataclass
-from typing import Tuple, Self
-from enum import Enum
-from collections import Counter
 from abc import ABC, abstractmethod
+from collections import Counter
+from dataclasses import dataclass
+from enum import Enum
+from typing import Self, Tuple
 
 
 class HandType(Enum):
@@ -18,11 +18,45 @@ class HandType(Enum):
         return HandTypeOrder.index(self) > HandTypeOrder.index(other)
 
 
-CardOrderPartOne = ("A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2")
-CardOrderPartTwo = ("A", "K", "Q", "T", "9", "8", "7", "6", "5", "4", "3", "2", "J")
+CardOrderPartOne = (
+    "A",
+    "K",
+    "Q",
+    "J",
+    "T",
+    "9",
+    "8",
+    "7",
+    "6",
+    "5",
+    "4",
+    "3",
+    "2",
+)
+CardOrderPartTwo = (
+    "A",
+    "K",
+    "Q",
+    "T",
+    "9",
+    "8",
+    "7",
+    "6",
+    "5",
+    "4",
+    "3",
+    "2",
+    "J",
+)
 HandTypeOrder = (
-    HandType.FIVE_OF_A_KIND, HandType.FOUR_OF_A_KIND, HandType.FULL_HOUSE, HandType.THREE_OF_A_KIND, HandType.TWO_PAIR,
-    HandType.ONE_PAIR, HandType.HIGH_CARD)
+    HandType.FIVE_OF_A_KIND,
+    HandType.FOUR_OF_A_KIND,
+    HandType.FULL_HOUSE,
+    HandType.THREE_OF_A_KIND,
+    HandType.TWO_PAIR,
+    HandType.ONE_PAIR,
+    HandType.HIGH_CARD,
+)
 Cards = Tuple[str, ...]
 
 
@@ -43,6 +77,8 @@ class HandABC(ABC):
         assert self.type is not None
 
     def __lt__(self, other: Self) -> bool:
+        assert self.type is not None
+        assert other.type is not None
         if self.type is other.type:
             for this_card, other_card in zip(self.cards, other.cards):
                 if this_card != other_card:
@@ -93,7 +129,9 @@ class HandPartTwo(HandABC):
                     return HandType.FOUR_OF_A_KIND
                 case HandType.FOUR_OF_A_KIND:
                     return HandType.FIVE_OF_A_KIND
-            raise ValueError(f"Didn't expect a {original_hand_type} with 1 joker")
+            raise ValueError(
+                f"Didn't expect a {original_hand_type} with 1 joker"
+            )
         elif number_of_jokers == 2:
             match original_hand_type:
                 case HandType.ONE_PAIR:
@@ -102,18 +140,24 @@ class HandPartTwo(HandABC):
                     return HandType.FOUR_OF_A_KIND
                 case HandType.FULL_HOUSE:
                     return HandType.FIVE_OF_A_KIND
-            raise ValueError(f"Didn't expect a {original_hand_type} with 2 jokers")
+            raise ValueError(
+                f"Didn't expect a {original_hand_type} with 2 jokers"
+            )
         elif number_of_jokers == 3:
             match original_hand_type:
                 case HandType.THREE_OF_A_KIND:
                     return HandType.FOUR_OF_A_KIND
                 case HandType.FULL_HOUSE:
                     return HandType.FIVE_OF_A_KIND
-            raise ValueError(f"Didn't expect a {original_hand_type} with 3 jokers")
+            raise ValueError(
+                f"Didn't expect a {original_hand_type} with 3 jokers"
+            )
         elif number_of_jokers == 4:
             if original_hand_type is HandType.FOUR_OF_A_KIND:
                 return HandType.FIVE_OF_A_KIND
-            raise ValueError(f"Didn't expect a {original_hand_type} with 4 jokers")
+            raise ValueError(
+                f"Didn't expect a {original_hand_type} with 4 jokers"
+            )
         else:
             return original_hand_type
 
@@ -141,16 +185,24 @@ def get_hand_type_from_cards(cards: Cards) -> HandType:
 
 def do_part_one(filename: str) -> int:
     with open(filename, "r") as file:
-        hands = [HandPartOne.from_line(line) for line in file.read().splitlines()]
+        hands = [
+            HandPartOne.from_line(line) for line in file.read().splitlines()
+        ]
     sorted_hands = sorted(hands)
-    return sum(rank * hand.bid for rank, hand in enumerate(sorted_hands, start=1))
+    return sum(
+        rank * hand.bid for rank, hand in enumerate(sorted_hands, start=1)
+    )
 
 
 def do_part_two(filename: str) -> int:
     with open(filename, "r") as file:
-        hands = [HandPartTwo.from_line(line) for line in file.read().splitlines()]
+        hands = [
+            HandPartTwo.from_line(line) for line in file.read().splitlines()
+        ]
     sorted_hands = sorted(hands)
-    return sum(rank * hand.bid for rank, hand in enumerate(sorted_hands, start=1))
+    return sum(
+        rank * hand.bid for rank, hand in enumerate(sorted_hands, start=1)
+    )
 
 
 def main():

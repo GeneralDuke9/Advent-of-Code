@@ -1,7 +1,19 @@
 import re
 
-PATTERN = re.compile(r"(?=([1-9]|one|two|three|four|five|six|seven|eight|nine))")
-STRING_TO_INT = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8, "nine": 9}
+PATTERN = re.compile(
+    r"(?=([1-9]|one|two|three|four|five|six|seven|eight|nine))"
+)
+STRING_TO_INT = {
+    "one": 1,
+    "two": 2,
+    "three": 3,
+    "four": 4,
+    "five": 5,
+    "six": 6,
+    "seven": 7,
+    "eight": 8,
+    "nine": 9,
+}
 
 
 def convert_digit(match: str) -> int:
@@ -11,7 +23,9 @@ def convert_digit(match: str) -> int:
 
 
 def find_first_and_last_digit(line: str) -> tuple[int, int]:
-    digits = [convert_digit(match.group(1)) for match in PATTERN.finditer(line)]
+    digits = [
+        convert_digit(match.group(1)) for match in PATTERN.finditer(line)
+    ]
     return digits[0], digits[-1]
 
 
