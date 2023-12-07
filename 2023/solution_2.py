@@ -32,15 +32,9 @@ class GameInfo:
 
 
 def determine_power(game_infos: list[GameInfo]) -> int:
-    max_red = max(
-        game_info.red for game_info in game_infos if game_info.red != 0
-    )
-    max_green = max(
-        game_info.green for game_info in game_infos if game_info.green != 0
-    )
-    max_blue = max(
-        game_info.blue for game_info in game_infos if game_info.blue != 0
-    )
+    max_red = max(game_info.red for game_info in game_infos if game_info.red != 0)
+    max_green = max(game_info.green for game_info in game_infos if game_info.green != 0)
+    max_blue = max(game_info.blue for game_info in game_infos if game_info.blue != 0)
     # print((max_red, max_green, max_blue))
     # print(max_red * max_green * max_blue)
     return max_red * max_green * max_blue
@@ -69,9 +63,7 @@ def parse_line(line: str) -> int:
 
 def main():
     with open("input_2_test", "r") as file:
-        assert (
-            sum(parse_line(line) for line in file.read().splitlines()) == 2286
-        )
+        assert sum(parse_line(line) for line in file.read().splitlines()) == 2286
     with open("input_2_full", "r") as file:
         print(sum(parse_line(line) for line in file.read().splitlines()))
 

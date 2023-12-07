@@ -11,10 +11,7 @@ class Race:
 def parse_file_part_one(lines: list[str]) -> list[Race]:
     times = lines[0].split(":")[-1].strip().split()
     distances = lines[1].split(":")[-1].strip().split()
-    return [
-        Race(time=int(time), distance=int(distance))
-        for time, distance in zip(times, distances)
-    ]
+    return [Race(time=int(time), distance=int(distance)) for time, distance in zip(times, distances)]
 
 
 def parse_file_part_two(lines: list[str]) -> Race:
@@ -26,9 +23,7 @@ def parse_file_part_two(lines: list[str]) -> Race:
 def number_of_ways_to_win(race: Race) -> int:
     a, b, c = determine_quadratic_coefficients(race)
     solutions = solve_quadratic(a, b, c)
-    return (
-        (math.ceil(max(solutions)) - 1) - (math.floor(min(solutions)) + 1) + 1
-    )
+    return (math.ceil(max(solutions)) - 1) - (math.floor(min(solutions)) + 1) + 1
 
 
 def determine_quadratic_coefficients(race: Race) -> tuple[int, int, int]:
@@ -39,9 +34,7 @@ def solve_quadratic(a: int, b: int, c: int) -> tuple[float, float]:
     assert a != 0
     discriminant = b**2 - 4 * a * c
     assert discriminant > 0
-    return (-b + math.sqrt(discriminant)) / (2 * a), (
-        -b - math.sqrt(discriminant)
-    ) / (2 * a)
+    return (-b + math.sqrt(discriminant)) / (2 * a), (-b - math.sqrt(discriminant)) / (2 * a)
 
 
 def do_part_one(filename: str) -> int:
