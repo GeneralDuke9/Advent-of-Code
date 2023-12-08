@@ -9,10 +9,10 @@ def do_part_two(filename: str) -> int:
 
 
 def main():
-    assert do_part_one("input_7_test") == 0
-    print(do_part_one("input_7"))
-    assert do_part_two("input_7_test") == 0
-    print(do_part_two("input_7"))
+    assert do_part_one("input_N_test") == 0
+    print(do_part_one("input_N_full"))
+    assert do_part_two("input_N_test") == 0
+    print(do_part_two("input_N_full"))
 
 
 if __name__ == "__main__":
