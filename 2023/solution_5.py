@@ -38,10 +38,6 @@ class ItemTypeMapper:
     def source_range_starts(self) -> list[int]:
         return sorted((item_type_map.source_range_start for item_type_map in self.item_type_maps), reverse=True)
 
-    @property
-    def destination_range_starts(self) -> list[int]:
-        return sorted((item_type_map.destination_range_start for item_type_map in self.item_type_maps), reverse=True)
-
     def get_item_type_map(self, source_range_start: int) -> ItemTypeMap:
         if self.item_type_map_by_source_range_start is None:
             self.item_type_map_by_source_range_start = {
@@ -56,28 +52,6 @@ class ItemTypeMapper:
             }
         return self.item_type_map_by_destination_range_start[destination_range_start]
 
-    def map_reversed(self, value: int) -> int:
-        if self.should_be_mapped_reversed(value):
-            return self.mapped_value_reversed(value)
-        return value
-
-    def map_reversed_and_get_range(self, value: int, current_range: int | None) -> tuple[int, int]:
-        mapped_value = self.map_reversed(value)
-        destination_range_start = find_closest_number_smaller_or_equals(value, self.destination_range_starts)
-        if destination_range_start is None:
-            this_range = min(self.destination_range_starts) - value
-            return mapped_value, this_range if current_range is None else min(this_range, current_range)
-        item_type_map = self.get_item_type_map_from_destination_range_start(destination_range_start)
-        if value - item_type_map.destination_range_start < item_type_map.range_length:
-            this_range = item_type_map.destination_range_start + item_type_map.range_length - value
-        else:
-            next_item_type_map = find_closest_number_larger(value, self.destination_range_starts)
-            if next_item_type_map is None:
-                this_range = current_range + 1
-            else:
-                this_range = next_item_type_map.destination_range_start + next_item_type_map.range_length - value
-        return mapped_value, this_range if current_range is None else min(this_range, current_range)
-
     def map(self, value: int) -> int:
         if self.should_be_mapped(value):
             return self.mapped_value(value)
@@ -88,32 +62,19 @@ class ItemTypeMapper:
         source_range_start = find_closest_number_smaller_or_equals(value, self.source_range_starts)
         if source_range_start is None:
             this_range = min(self.source_range_starts) - value
-            if current_range is None:
-                return mapped_value, this_range
-            return mapped_value, min(this_range, current_range)
+            return mapped_value, safe_min(this_range, current_range)
         item_type_map = self.get_item_type_map(source_range_start)
         if value - item_type_map.source_range_start < item_type_map.range_length:
             this_range = item_type_map.source_range_start + item_type_map.range_length - value
-            if current_range is None:
-                return mapped_value, this_range
-            return mapped_value, min(this_range, current_range)
+            return mapped_value, safe_min(this_range, current_range)
 
         next_source_range_start = find_closest_number_larger(value, self.source_range_starts)
         if next_source_range_start is None:
+            assert current_range is not None
             return mapped_value, current_range
         next_item_type_map = self.get_item_type_map(next_source_range_start)
         this_range = next_item_type_map.source_range_start - value
-        if current_range is None:
-            return mapped_value, this_range
-        return mapped_value, min(this_range, current_range)
-
-    def should_be_mapped_reversed(self, value: int) -> bool:
-        destination_range_start = find_closest_number_smaller_or_equals(value, self.destination_range_starts)
-        if destination_range_start is None:
-            return False
-        item_type_map = self.get_item_type_map_from_destination_range_start(destination_range_start)
-        assert destination_range_start == item_type_map.destination_range_start
-        return value - item_type_map.destination_range_start < item_type_map.range_length
+        return mapped_value, safe_min(this_range, current_range)
 
     def should_be_mapped(self, value: int) -> bool:
         source_range_start = find_closest_number_smaller_or_equals(value, self.source_range_starts)
@@ -122,12 +83,6 @@ class ItemTypeMapper:
         item_type_map = self.get_item_type_map(source_range_start)
         assert source_range_start == item_type_map.source_range_start
         return value - item_type_map.source_range_start < item_type_map.range_length
-
-    def mapped_value_reversed(self, value: int) -> int:
-        destination_range_start = find_closest_number_smaller_or_equals(value, self.destination_range_starts)
-        assert destination_range_start is not None
-        item_type_map = self.get_item_type_map_from_destination_range_start(destination_range_start)
-        return item_type_map.source_range_start + (value - item_type_map.destination_range_start)
 
     def mapped_value(self, value: int) -> int:
         source_range_start = find_closest_number_smaller_or_equals(value, self.source_range_starts)
@@ -236,16 +191,17 @@ class AlmanacDataPartTwo(AlmanacDataABC):
 
     def get_lowest_location_number_for_seeds(self) -> int:
         locations = []
-        seed: int | None = min(self.seed_range_starts)
+        seed = min(self.seed_range_starts)
         while seed <= self.max_seed_value:
             current_seed_range = self.find_current_seed_range(seed)
             location, current_range = self.find_location_and_current_range("seed", seed, current_seed_range)
             locations.append(location)
             seed += current_range
             if not self.is_valid_seed_number(seed):
-                seed = find_closest_number_larger(seed, self.seed_range_starts)
-                if seed is None:
+                next_seed = find_closest_number_larger(seed, self.seed_range_starts)
+                if next_seed is None:
                     return min(locations)
+                seed = next_seed
         return min(locations)
 
     def find_location_and_current_range(self, item_type: str, value: int, current_range: int) -> tuple[int, int]:
@@ -293,6 +249,18 @@ def find_closest_number_larger(value_to_match: int, available_values: list[int])
             continue
         return value
     return None
+
+
+def safe_min(a: int | None, b: int | None) -> int:
+    if a is None and b is None:
+        raise ValueError("Both values are None")
+    assert a is not None
+    assert b is not None
+    if a is None:
+        return b
+    if b is None:
+        return a
+    return min(a, b)
 
 
 def do_part_one(filename: str) -> int:

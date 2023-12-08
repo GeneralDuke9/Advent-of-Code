@@ -64,21 +64,21 @@ def get_surrounding_numbers(match: Match, row_number: int, all_data: list[str]) 
 def do_part_1(filename: str) -> int:
     with open(filename, "r") as file:
         all_data = file.read().splitlines()
-    sum = 0
-    for idx, line in enumerate(all_data):
-        for match_ in NUMBER_PATTERN.finditer(line):
-            sum += get_part_number_if_valid(match_, idx, all_data)
-    return sum
+    return sum(
+        get_part_number_if_valid(match, idx, all_data)
+        for idx, line in enumerate(all_data)
+        for match in NUMBER_PATTERN.finditer(line)
+    )
 
 
 def do_part_2(filename: str) -> int:
     with open(filename, "r") as file:
         all_data = file.read().splitlines()
-    sum = 0
-    for idx, line in enumerate(all_data):
-        for match_ in GEAR_PATTERN.finditer(line):
-            sum += get_gear_ratio_if_valid(match_, idx, all_data)
-    return sum
+    return sum(
+        get_gear_ratio_if_valid(match, idx, all_data)
+        for idx, line in enumerate(all_data)
+        for match in GEAR_PATTERN.finditer(line)
+    )
 
 
 def main():
