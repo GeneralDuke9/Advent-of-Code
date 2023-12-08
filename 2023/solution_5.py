@@ -1,7 +1,9 @@
 import itertools
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Iterator
+from typing import Generic, Iterator, TypeVar
+
+T = TypeVar("T")
 
 
 @dataclass(frozen=True, slots=True)
@@ -91,8 +93,8 @@ class ItemTypeMapper:
         return item_type_map.destination_range_start + (value - item_type_map.source_range_start)
 
 
-class AlmanacDataABC(ABC):
-    seeds: list
+class AlmanacDataABC(ABC, Generic[T]):
+    seeds: list[T]
     seed_to_soil: ItemTypeMapper
     soil_to_fertilizer: ItemTypeMapper
     fertilizer_to_water: ItemTypeMapper
@@ -115,7 +117,7 @@ class AlmanacDataABC(ABC):
 
     @staticmethod
     @abstractmethod
-    def parse_seeds(line: str) -> list:
+    def parse_seeds(line: str) -> list[T]:
         pass
 
     @staticmethod
@@ -124,7 +126,7 @@ class AlmanacDataABC(ABC):
         return ItemTypeMapper.from_lines(line_iterator)
 
 
-class AlmanacDataPartOne(AlmanacDataABC):
+class AlmanacDataPartOne(AlmanacDataABC[int]):
     @staticmethod
     def parse_seeds(line: str) -> list[int]:
         return [int(number) for number in line.split(":")[-1].strip().split(" ")]
@@ -154,7 +156,7 @@ class AlmanacDataPartOne(AlmanacDataABC):
         raise ValueError(f"{item_type} not a valid item type")
 
 
-class AlmanacDataPartTwo(AlmanacDataABC):
+class AlmanacDataPartTwo(AlmanacDataABC[SeedRange]):
     seed_range_by_seed_range_start: dict[int, SeedRange] | None = None
 
     @staticmethod
